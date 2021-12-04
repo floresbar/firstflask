@@ -6,12 +6,14 @@ import pandas as pd
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
+""" this is redundant after the csv file
 wines = [
     {"id": 0, "alcohol": 8, "quality": 10},
     {"id": 1, "alcohol": 12, "quality": 8},
     {"id": 2, "alcohol": 10.5, "quality": 9},
 ]
-
+"""
+# reads the data from the csv file specified
 module_dir = os.path.abspath(os.path.dirname(__file__))
 file_path = os.path.join(module_dir, "winequality-white.csv")
 df = pd.read_csv(file_path, sep=";")
@@ -36,3 +38,14 @@ def get_wine_by_id():
 
     row = df.iloc[[id]]
     return Response(row.to_json(orient="index"), mimetype="application/json")
+
+# Adds a filter functionality to return wines by 'quality' feature
+@app.route("/api/wines/filter", methods=["GET"])
+def filter_wines():
+    requested_quality = request.args.get("quality")
+    if requested_quality:
+        filtered_data = df[df.quality == int(requested_quality)]
+        return Response(
+            filtered_data.to_json(orient="index"), mimetype="application/json"
+        )
+    return []
