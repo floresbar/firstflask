@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -16,3 +16,18 @@ wines = [
 @app.route("/api/wines/all", methods=["GET"])
 def return_all():
     return jsonify(wines)
+
+@app.route("/api/wines", methods=["GET"])
+def get_wine_by_id():
+    if "id" in request.args:
+        id = int(request.args["id"])
+    else:
+        return "Error: No id field provided. Please specify an id."
+
+    results = []
+
+    for wine in wines:
+        if wine["id"] == id:
+            results.append(wine)
+
+    return jsonify(results)
